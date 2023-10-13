@@ -133,7 +133,7 @@ def production(company_data, company_nordem):
 
 
 # * lines to try the code only activate to prove data
-# producion_of_company = production(company_data, 770450)
+# producion_of_company = production(company_data, 438)
 # print(producion_of_company)
 
 # *Resume Tables of production
@@ -264,19 +264,7 @@ def all_personal(company_data, company_nordem):
             "II_PA_AP__AAEP": "#_admin_ape",
         }
     )
-    # order de columns and gives new names
-    admin_order_var = [
-        "#_admin_per_dir",
-        "admin_per_dir",
-        "#_admin_tem_dir",
-        "admin_tem_dir",
-        "#_admin_tem_emp",
-        "admin_per_emp",
-        "#_admin_ape",
-        "admin_per_apr",
-    ]
-    # company admin personal table finished
-    company_admin_per = company_admin_per.reindex(columns=admin_order_var)
+
 
     """ create table production workers,
     delete colums, order columns and create a table of production workers"""
@@ -312,7 +300,25 @@ def all_personal(company_data, company_nordem):
             "II_PP_AP__APEP": "#_prod_apr",
         }
     )
+
+    company_admin_per = company_admin_per.reset_index(drop=False)
+    company_prod_per = company_prod_per.reset_index(drop=False)
+    
+    company_prod_per["Periodo"] = pd.to_datetime(
+    company_prod_per["anio"].astype(str) + "-" + company_prod_per["mes"].astype(str),
+    format="%Y-%m",
+    )
+    company_prod_per = company_prod_per.drop(["anio", "mes"], axis= 1)
+    
+    
+    company_admin_per["Periodo"] = pd.to_datetime(
+    company_admin_per["anio"].astype(str) + "-" + company_admin_per["mes"].astype(str),
+    format="%Y-%m",
+    )
+    company_admin_per = company_admin_per.drop(["anio", "mes"], axis= 1)
+    
     prod_per_order = [
+        "Periodo",
         "#_prod_dir",
         "pro_per_dir",
         "#_prod_tem_dir",
@@ -323,5 +329,26 @@ def all_personal(company_data, company_nordem):
         "pro_per_apr",
     ]
     company_prod_per = company_prod_per.reindex(columns=prod_per_order)
+    
+    # order de columns and gives new names
+    admin_order_var = [
+        "Periodo",
+        "#_admin_per_dir",
+        "admin_per_dir",
+        "#_admin_tem_dir",
+        "admin_tem_dir",
+        "#_admin_tem_emp",
+        "admin_per_emp",
+        "#_admin_ape",
+        "admin_per_apr",
+    ]
+    # company admin personal table finished
+    company_admin_per = company_admin_per.reindex(columns=admin_order_var)
 
     return company_prod_per, company_admin_per
+
+
+# * lines to try the code only activate to prove data
+# personal_pro, personal_admin = all_personal(company_data, 438)
+# print(personal_pro)
+# print(personal_admin)
