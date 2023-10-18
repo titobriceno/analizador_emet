@@ -133,8 +133,8 @@ def production(company_data, company_nordem):
 
 
 # * lines to try the code only activate to prove data
-# producion_of_company = production(company_data, 438)
-# print(producion_of_company)
+producion_of_company = production(company_data, 438)
+print(producion_of_company)
 
 # *Resume Tables of production
 # funtion to resume production and sells per yeart
@@ -161,7 +161,7 @@ def resume_hours(data):
     ]
     final_mount = data
     final_mount = final_mount.drop(columns= for_drop)
-    before_period = final_mount.iloc[-12]
+    before_period = final_mount.iloc[-13]
     before_period = before_period.to_frame().T
     final_mount = final_mount.iloc[-2:]
     final_mount = pd.concat([before_period, final_mount ], axis=0)
@@ -348,7 +348,134 @@ def all_personal(company_data, company_nordem):
     return company_prod_per, company_admin_per
 
 
+def production_var(data):
+    actual_mount = data.iloc[-1]
+    actual_mount = actual_mount.to_frame().T
+    before_mount = data.iloc[-2]
+    before_mount = before_mount.to_frame().T
+
+    colums = [
+        "Produccion",
+        "Ventas_int",
+        "Ventas_ext",
+        "total_ventas",
+        "tot_empleo",
+        "tot_operativo",
+        "sal_percapita",
+        "Horas_Ord",
+        "Horas_Ext",
+    ]
+
+    mount = pd.concat([before_mount, actual_mount])
+    mount = mount.drop(
+        columns=[
+            "Existen",
+            "pro-ven",
+            "dif-inv",
+            "coeficiente",
+        ]
+    )
+    variation = mount[colums].pct_change() * 100
+    mount = pd.concat([mount, variation])
+    mount = mount.reset_index(drop=False)
+    mount = mount.rename(index={mount.index[-1]: "Variacion"})
+    mount = mount.drop(2)
+    mount = mount.drop(columns="index")
+    mount = mount.reset_index(drop=False)
+
+    twuelve_mount = data.iloc[-13]
+    twuelve_mount = twuelve_mount.to_frame().T
+    year = pd.concat([twuelve_mount, actual_mount])
+    year = year.drop(
+        columns=[
+            "Existen",
+            "pro-ven",
+            "dif-inv",
+            "coeficiente",
+        ]
+    )
+    variation_year = year[colums].pct_change() * 100
+    year = pd.concat([year, variation_year])
+    year = year.reset_index(drop=False)
+    year = year.rename(index={year.index[-1]: "Variacion"})
+    year = year.drop(2)
+    year = year.drop(columns="index")
+    year = year.reset_index(drop=False)
+
+    return mount, year
+
+
+def var_personal_admin(data):
+    actual_mount = data.iloc[-1]
+    actual_mount = actual_mount.to_frame().T
+    mount_before = data.iloc[-2]
+    mount_before = mount_before.to_frame().T
+    mount = pd.concat([mount_before, actual_mount])
+    numeric_colums = [
+        "#_admin_per_dir",
+        "admin_per_dir",
+        "#_admin_tem_dir",
+        "admin_tem_dir",
+        "#_admin_tem_emp",
+        "admin_per_emp",
+        "#_admin_ape",
+        "admin_per_apr"
+    ]
+    print(numeric_colums)
+    variation = mount[numeric_colums].pct_change() * 100
+    mount = pd.concat([mount, variation])
+    mount = mount.reset_index(drop=False)
+    mount = mount.rename(index={mount.index[-1]: "Variacion"})
+    mount = mount.drop(2)
+
+    before_year = data.iloc[-13]
+    before_year = before_year.to_frame().T
+    year = pd.concat([before_year, actual_mount])
+    variation_year = year[numeric_colums].pct_change() * 100
+    year = pd.concat([year, variation_year])
+    year = year.reset_index(drop=False)
+    year = year.rename(index={year.index[-1]: "Variacion"})
+    year = year.drop(2)
+
+    return mount, year
+
+
+def var_personal_prod(data):
+    actual_mount = data.iloc[-1]
+    actual_mount = actual_mount.to_frame().T
+    mount_before = data.iloc[-2]
+    mount_before = mount_before.to_frame().T
+    mount = pd.concat([mount_before, actual_mount])
+    numeric_colums = [
+        "#_prod_dir",
+        "pro_per_dir",
+        "#_prod_tem_dir",
+        "pro_tem_dir",
+        "#_prod_tem_emp",
+        "pro_per_emp",
+        "#_prod_apr",
+        "pro_per_apr"
+    ]
+    variation = mount[numeric_colums].pct_change() * 100
+    mount = pd.concat([mount, variation])
+    mount = mount.reset_index(drop=False)
+    mount = mount.rename(index={mount.index[-1]: "Variacion"})
+    mount = mount.drop(2)
+
+    before_year = data.iloc[-13]
+    before_year = before_year.to_frame().T
+    year = pd.concat([before_year, actual_mount])
+    variation_year = year[numeric_colums].pct_change() * 100
+    year = pd.concat([year, variation_year])
+    year = year.reset_index(drop=False)
+    year = year.rename(index={year.index[-1]: "Variacion"})
+    year = year.drop(2)
+
+    return mount, year
+
+
 # * lines to try the code only activate to prove data
-# personal_pro, personal_admin = all_personal(company_data, 438)
-# print(personal_pro)
-# print(personal_admin)
+personal_pro, personal_admin = all_personal(company_data, 438)
+var_mount, var_mes = var_personal_prod(personal_pro)
+print(var_mount)
+print(var_mes)
